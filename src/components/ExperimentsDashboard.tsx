@@ -32,7 +32,15 @@ const CONFIDENCE_COLORS: Record<string, string> = {
   low: '#f85149',
   medium: '#d29922',
   high: '#3fb950',
+  significant: '#a371f7',
 };
+
+const CONFIDENCE_RULES = [
+  { level: 'Low', minUsers: '< 30', minLift: 'Any', color: '#f85149' },
+  { level: 'Medium', minUsers: '100+', minLift: '20%+', color: '#d29922' },
+  { level: 'High', minUsers: '500+', minLift: '15%+', color: '#3fb950' },
+  { level: 'Significant', minUsers: '1000+', minLift: '10%+', color: '#a371f7' },
+];
 
 const CHART_PALETTE = ['#58a6ff', '#3fb950', '#f0883e', '#a371f7', '#f85149', '#8b949e'];
 
@@ -47,6 +55,7 @@ export default function ExperimentsDashboard() {
   
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [showJson, setShowJson] = useState(false);
 
   // Check API health on mount
   useEffect(() => {
@@ -354,6 +363,38 @@ export default function ExperimentsDashboard() {
                 </div>
               </div>
 
+              {/* Raw JSON Viewer */}
+              {results && (
+                <div className="bg-[var(--card-bg)] border border-[var(--card-border)] rounded-2xl overflow-hidden">
+                  <button
+                    onClick={() => setShowJson(!showJson)}
+                    className="w-full px-6 py-4 flex items-center justify-between text-left hover:bg-white/5 transition-colors"
+                  >
+                    <div className="flex items-center gap-2">
+                      <svg className="w-5 h-5 text-cyan-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" />
+                      </svg>
+                      <span className="text-lg font-semibold text-white">Raw JSON Response</span>
+                    </div>
+                    <svg 
+                      className={`w-5 h-5 text-gray-400 transition-transform ${showJson ? 'rotate-180' : ''}`} 
+                      fill="none" 
+                      viewBox="0 0 24 24" 
+                      stroke="currentColor"
+                    >
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                    </svg>
+                  </button>
+                  {showJson && (
+                    <div className="px-6 pb-6">
+                      <pre className="bg-black/30 border border-[var(--card-border)] rounded-xl p-4 overflow-x-auto text-sm text-gray-300 font-mono max-h-96 overflow-y-auto">
+                        {JSON.stringify(results, null, 2)}
+                      </pre>
+                    </div>
+                  )}
+                </div>
+              )}
+
               {results?.summary && (
                 <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
                   {[
@@ -393,6 +434,48 @@ export default function ExperimentsDashboard() {
                   ))}
                 </div>
               )}
+
+              {/* Confidence Level Rules */}
+              <div className="bg-[var(--card-bg)] border border-[var(--card-border)] rounded-2xl p-6">
+                <h3 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
+                  <svg className="w-5 h-5 text-purple-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                  Confidence Level Rules
+                </h3>
+                <div className="overflow-x-auto">
+                  <table className="w-full text-sm">
+                    <thead>
+                      <tr className="border-b border-[var(--card-border)]">
+                        <th className="text-left py-2 px-3 text-gray-400 font-medium">Confidence</th>
+                        <th className="text-left py-2 px-3 text-gray-400 font-medium">Min Users/Variant</th>
+                        <th className="text-left py-2 px-3 text-gray-400 font-medium">Min Lift</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {CONFIDENCE_RULES.map((rule) => (
+                        <tr key={rule.level} className="border-b border-[var(--card-border)]/50">
+                          <td className="py-2 px-3">
+                            <span 
+                              className="inline-flex items-center gap-2 px-2 py-0.5 rounded-full text-xs font-medium"
+                              style={{ 
+                                background: `${rule.color}20`,
+                                color: rule.color,
+                                border: `1px solid ${rule.color}40`
+                              }}
+                            >
+                              <span className="w-1.5 h-1.5 rounded-full" style={{ background: rule.color }} />
+                              {rule.level}
+                            </span>
+                          </td>
+                          <td className="py-2 px-3 text-gray-300 font-mono">{rule.minUsers}</td>
+                          <td className="py-2 px-3 text-gray-300 font-mono">{rule.minLift}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
 
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 {variantAllocationData.length > 0 && (

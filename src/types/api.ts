@@ -66,7 +66,7 @@ export interface ResultsSummary {
   total_events: number;
   overall_conversion_rate: number;  
   leading_variant: string | null;
-  confidence_level: 'low' | 'medium' | 'high';
+  confidence_level: 'low' | 'medium' | 'high' | 'significant';
 }
 
 export interface ExperimentResults {
