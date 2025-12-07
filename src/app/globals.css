@@ -1,8 +1,15 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #0d1117;
+  --foreground: #e6edf3;
+  --accent: #58a6ff;
+  --accent-glow: rgba(88, 166, 255, 0.4);
+  --card-bg: #161b22;
+  --card-border: #30363d;
+  --success: #3fb950;
+  --warning: #d29922;
+  --danger: #f85149;
 }
 
 @theme inline {
@@ -12,15 +19,58 @@
   --font-mono: var(--font-geist-mono);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+* {
+  box-sizing: border-box;
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: 'Geist', system-ui, sans-serif;
+  min-height: 100vh;
+}
+
+.dx-widget {
+  font-family: inherit !important;
+}
+
+.dx-datagrid {
+  background: var(--card-bg) !important;
+  border-radius: 12px;
+  border: 1px solid var(--card-border) !important;
+}
+
+.dx-datagrid-headers {
+  background: rgba(88, 166, 255, 0.1) !important;
+  border-bottom: 1px solid var(--card-border) !important;
+}
+
+.dx-datagrid-rowsview .dx-row {
+  border-bottom: 1px solid var(--card-border) !important;
+}
+
+.dx-datagrid-rowsview .dx-row:hover {
+  background: rgba(88, 166, 255, 0.05) !important;
+}
+
+.dx-chart {
+  background: transparent !important;
+}
+
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--card-bg);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--card-border);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--accent);
 }
