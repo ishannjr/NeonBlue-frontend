@@ -4,7 +4,9 @@ import type {
   ExperimentResults 
 } from '@/types/api';
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://ec2-3-136-108-183.us-east-2.compute.amazonaws.com:8000';
+// Use the proxy to avoid mixed content issues (HTTPS frontend -> HTTP backend)
+// The proxy runs server-side and can make HTTP requests
+const API_BASE_URL = '/api/proxy';
 
 let authToken: string | null = null;
 
@@ -42,8 +44,12 @@ async function fetchWithAuth<T>(
   return response.json();
 }
 
+// Health check goes through proxy too
 export async function checkHealth(): Promise<{ status: string; version: string }> {
   const response = await fetch(`${API_BASE_URL}/health`);
+  if (!response.ok) {
+    throw new Error('API health check failed');
+  }
   return response.json();
 }
 
@@ -97,4 +103,3 @@ export async function getExperimentResults(
 export async function getEventTypes(): Promise<{ event_types: Array<{ type: string; count: number }> }> {
   return fetchWithAuth<{ event_types: Array<{ type: string; count: number }> }>('/events/types');
 }
-
